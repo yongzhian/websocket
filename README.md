@@ -1,2 +1,2 @@
 # websocke
-<img src="wstest.jpg">
+<img src="websocketserver/wstest.jpg">

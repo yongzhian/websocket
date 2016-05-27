@@ -65,7 +65,7 @@ public class Client {
 		builder.append(", createTime=");
 		builder.append(createTime);
 		builder.append(", session=");
-		builder.append(session);
+		builder.append(session.getId());
 		builder.append("]");
 		return builder.toString();
 	}

@@ -1,12 +1,11 @@
 package com.zain.dto;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import javax.websocket.Session;
 
-import com.zain.websocket.WebSocket;
+import org.apache.log4j.Logger;
 
 public class Room {
 	private Logger logger = Logger.getLogger(Room.class);
@@ -56,8 +55,12 @@ public class Room {
 	 * @param client
 	 * @return
 	 */
-	public boolean removeClient(String clientId){
-		return this.clientsMap.remove(clientId) == null;
+	public boolean removeClient(Session session,String clientId){
+		Client client  = this.getClientsMap().get(clientId);//通过session
+		if(null != client && null != client.getSession() &&  client.getSession().getId().equals(session.getId())){
+			return this.clientsMap.remove(clientId) == null;
+		}
+		return false;
 	}
 	
 	public Type getType() {

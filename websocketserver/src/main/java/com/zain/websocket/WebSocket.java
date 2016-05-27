@@ -79,7 +79,7 @@ public class WebSocket {
 		logger.info("客户端连接断开 ,rid : " + rid + "  uid:"+ uid);
 		if (RoomTable.roomMap.containsKey(rid)) { // 当前房间已经存在
 			Room room = RoomTable.roomMap.get(rid);
-			if(room.removeClient(uid)){
+			if(room.removeClient(session,uid)){
 				logger.info("移除客户端成功 ,rid : " + rid + "  uid:"+ uid);
 				return;
 			}

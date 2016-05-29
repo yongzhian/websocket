@@ -1,8 +1,12 @@
 package com.zain.dto;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.websocket.CloseReason;
 import javax.websocket.Session;
 
 import org.apache.log4j.Logger;
@@ -36,10 +40,30 @@ public class Room {
 	 * @param client
 	 * @return
 	 */
-	public boolean addClient(Client client){
+	public boolean addClient(final Client client){
 		if(null != client && !this.clientsMap.containsKey(client.getId())){
 			if(this.type.equals(Type.P2P) && this.clientsMap.size()<2){ //p2p房间最多允许2个用户
 				this.clientsMap.put(client.getId(), client);
+				if( this.clientsMap.size() == 1){ //如果房间只有一个客户端 则超时清除
+					Timer timer = new Timer();
+					timer.schedule(new TimerTask() {
+			            public void run() {
+			            	logger.info("-------超时未加入则清除用户--------");
+			                if(clientsMap.size() == 1){
+			                	try {
+			                		RoomTable.timeOutClient.add(client.getId());
+									client.getSession().close(new CloseReason(CloseReason.CloseCodes.GOING_AWAY, "超时仍无用户加入.."));
+									client.setSession(null);//清空session
+			                	} catch (IOException e) {
+//									logger.error("超时清除ws连接异常", e);
+									e.printStackTrace();
+								}
+			                }
+			                this.cancel(); //执行一次后销毁
+			                
+			            }
+			        }, RoomTable.MAX_TIME_OUT);// 设定指定的时间time,此处为2000毫秒
+				}
 			}else{ //多人房间可任意进入
 				this.clientsMap.put(client.getId(), client);
 			}
@@ -57,8 +81,13 @@ public class Room {
 	 */
 	public boolean removeClient(Session session,String clientId){
 		Client client  = this.getClientsMap().get(clientId);//通过session
-		if(null != client && null != client.getSession() &&  client.getSession().getId().equals(session.getId())){
-			return this.clientsMap.remove(clientId) == null;
+		if(null != client ){
+			if(null != client.getSession() &&  client.getSession().getId().equals(session.getId())){
+				return this.clientsMap.remove(clientId) == null;
+			}
+			if(RoomTable.timeOutClient.contains(clientId)){
+				return this.clientsMap.remove(clientId) == null;
+			}
 		}
 		return false;
 	}

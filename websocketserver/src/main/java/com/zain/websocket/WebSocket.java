@@ -6,6 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -27,7 +28,7 @@ public class WebSocket {
 	private Logger logger = Logger.getLogger(WebSocket.class);
 
 	@OnMessage
-	public void OnMessage(String message, Session session) {
+	public void onMessage(String message, Session session) {
 		logger.info("received message : " + message);
 		try {
 			session.getBasicRemote().sendText("欢迎你 上线");
@@ -44,7 +45,7 @@ public class WebSocket {
 	 * @param uid
 	 */
 	@OnOpen
-	public void OnOpen(Session session, @PathParam("rid") String rid, @PathParam("uid") String uid) {
+	public void onOpen(Session session, @PathParam("rid") String rid, @PathParam("uid") String uid) {
 		long createTime = System.currentTimeMillis();
 		Room room = null;
 		logger.info("客户端连接建立 ,rid : " + rid + "  uid:"+ uid);
@@ -75,16 +76,25 @@ public class WebSocket {
 	}
 
 	@OnClose
-	public void OnClose(Session session, @PathParam("rid") String rid, @PathParam("uid") String uid) {
+	public void onClose(Session session, @PathParam("rid") String rid, @PathParam("uid") String uid) {
 		logger.info("客户端连接断开 ,rid : " + rid + "  uid:"+ uid);
 		if (RoomTable.roomMap.containsKey(rid)) { // 当前房间已经存在
 			Room room = RoomTable.roomMap.get(rid);
 			if(room.removeClient(session,uid)){
 				logger.info("移除客户端成功 ,rid : " + rid + "  uid:"+ uid);
+				if(room.getClientsMap().isEmpty()){
+					RoomTable.roomMap.remove(rid);//没有用户时则清空
+					logger.info("房间用户清空，移除房间.");
+				}
 				return;
 			}
 		}
 		logger.info("移除客户端失败，无此房间或客户端 ,rid : " + rid + "  uid:"+ uid);
+	}
+	
+	@OnError
+	public void onError(Session session, Throwable throwable){
+		
 	}
 
 	public static synchronized void addOnlineCount() {

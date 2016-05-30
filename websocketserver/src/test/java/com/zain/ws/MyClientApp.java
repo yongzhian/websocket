@@ -14,8 +14,8 @@ public class MyClientApp {
 	@Test
 	public void connTest(){
 		WebSocketContainer container = ContainerProvider.getWebSocketContainer(); 
-		String uri ="ws://localhost:11587/websocketserver/rtc/a/a"; 
-		System.out.println("Connecting to"+ uri); 
+		String uri ="ws://yongzhian.cn:8080/websocketserver/rtc/a/a"; 
+		System.out.println("Connecting to "+ uri); 
 		 try { 
 			 Session  session = container.connectToServer(WsClient.class, URI.create(uri)); 
 			 session.getBasicRemote().sendText("wos client");

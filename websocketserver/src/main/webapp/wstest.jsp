@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <title>WebSoket Demo</title>
-<script type="text/javascript" src="./jquery-1.12.1.js"></script>
+<script type="text/javascript" src="js/jquery-1.12.1.js"></script>
 <script type="text/javascript">
 	 
             //验证浏览器是否支持WebSocket协议
@@ -132,7 +132,7 @@
 	<br />     
 	<br />ws服务器地址：
 	<input name="wsadd" id="wsaddID" size="50" style="font-size: 15"
-		value="ws://localhost:11587/websocketserver/rtc/a/a" placeholder="请输入ws服务器地址" />
+		value="ws://yongzhian.cn:8080/websocketserver/rtc/a/a" placeholder="请输入ws服务器地址" />
 	&nbsp;&nbsp;&nbsp;&nbsp;
 	<button id="conn" style="font-size: 17" onClick="javascript:display()">连接</button>
 	&nbsp;&nbsp;

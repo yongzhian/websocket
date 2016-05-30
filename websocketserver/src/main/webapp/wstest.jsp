@@ -132,7 +132,7 @@
 	<br />     
 	<br />ws服务器地址：
 	<input name="wsadd" id="wsaddID" size="50" style="font-size: 15"
-		value="wss://rtc.flwrobot.com/collider/ws" placeholder="请输入ws服务器地址" />
+		value="ws://localhost:11587/websocketserver/rtc/a/a" placeholder="请输入ws服务器地址" />
 	&nbsp;&nbsp;&nbsp;&nbsp;
 	<button id="conn" style="font-size: 17" onClick="javascript:display()">连接</button>
 	&nbsp;&nbsp;

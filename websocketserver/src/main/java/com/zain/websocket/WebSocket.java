@@ -1,7 +1,7 @@
 package com.zain.websocket;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.websocket.CloseReason;
@@ -13,7 +13,6 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.zain.dto.Client;
@@ -28,13 +27,25 @@ public class WebSocket {
 	private Logger logger = Logger.getLogger(WebSocket.class);
 
 	@OnMessage
-	public void onMessage(String message, Session session) {
+	public void onMessage(String message, Session session,@PathParam("rid") String rid, @PathParam("uid") String uid) {
 		logger.info("received message : " + message);
-		try {
-			session.getBasicRemote().sendText("欢迎你 上线");
-		} catch (IOException e) {
-			e.printStackTrace();
+		logger.info("current sessionid : " + session.getId());
+		logger.info("current room : " + RoomTable.roomMap.get(rid));
+		
+		logger.info("current stored client : " + RoomTable.roomMap.get(rid).getCurrClient(uid));
+		logger.info("current stored client session id : " + RoomTable.roomMap.get(rid).getCurrClient(uid).getSession().getId());
+		List<Client> clientList = RoomTable.roomMap.get(rid).getOtherClient(uid);
+		if(null != clientList && clientList.size() > 0){
+			for(Client client:clientList){
+				logger.info("current stored other client : " + RoomTable.roomMap.get(rid).getOtherClient(uid));
+				try {
+					client.getSession().getBasicRemote().sendText(uid + " : " + message);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
+		
 	}
 
 	/**
@@ -52,19 +63,19 @@ public class WebSocket {
 		if (RoomTable.roomMap.containsKey(rid)) { // 当前房间已经存在
 			room = RoomTable.roomMap.get(rid);
 			if (room.addClient(new Client(uid, new CopyOnWriteArrayList<String>(), createTime, session))) {
-				logger.info("客户端加入房间成功 ,rid : " + rid + "  uid:"+ uid);
+				logger.info("Other client join room successed ,rid : " + rid + "  uid:"+ uid);
 				return;
 			}else{
-				logger.info("客户端加入房间失败 ,rid : " + rid + "  uid:"+ uid);
+				logger.info("Other client join room failed ,rid : " + rid + "  uid:"+ uid);
 			}
 		} else {
 			room = new Room(Room.Type.P2P, rid, createTime); //默认创建p2p房间
 			if (room.addClient(new Client(uid, new CopyOnWriteArrayList<String>(), createTime, session))) {
-				logger.info("客户端加入房间成功 ,rid : " + rid + "  uid:"+ uid);
+				logger.info("The first client join room successed ,rid : " + rid + "  uid:"+ uid);
 				RoomTable.roomMap.put(rid, room); //第一次需要注册房间到RoomTable
 				return;
 			}else{
-				logger.info("客户端加入房间失败 ,rid : " + rid + "  uid:"+ uid);
+				logger.info("The first client join room failed ,rid : " + rid + "  uid:"+ uid);
 			}
 		}
 		
@@ -94,7 +105,7 @@ public class WebSocket {
 	
 	@OnError
 	public void onError(Session session, Throwable throwable){
-		
+		logger.error(session.getId(), throwable);
 	}
 
 	public static synchronized void addOnlineCount() {

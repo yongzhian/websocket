@@ -42,6 +42,14 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.16</version>
 		</dependency>
+		
+		<!-- http://mvnrepository.com/artifact/org.glassfish.tyrus.bundles/tyrus-standalone-client -->
+		<dependency>
+		    <groupId>org.glassfish.tyrus.bundles</groupId>
+		    <artifactId>tyrus-standalone-client</artifactId>
+		    <version>1.12</version>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<finalName>websocketserver</finalName>

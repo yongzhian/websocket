@@ -115,8 +115,7 @@ body {
 		var localStream; // 本地视频流
 		var remoteStream; // 远程视频流
 		var localVideoUrl; // 本地视频地址
-		var initiator = $
-		{
+		var initiator = ${
 			requestScope.initiator
 		}; // 是否已经有人在等待
 

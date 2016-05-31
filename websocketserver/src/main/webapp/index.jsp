@@ -28,8 +28,8 @@
 
 </head>
 <body  >
-<a href="rtc/req.do">开始进行rtc 通信<%=path %>rtc/req.do</a><br>
-<a href="wstest.jsp">rtc 测试页面</a>
+<a href="webrtc/rtc/req.do">开始进行rtc 通信<%=path %>rtc/req.do</a><br>
+<a href="webrtc/wstest.jsp">rtc 测试页面</a>
 
 </body>
 </html>

@@ -28,7 +28,6 @@ public class WebrtcControler {
 	
 	@RequestMapping(value = "/req.do", method = RequestMethod.GET)
 	public String roomCreate(HttpServletRequest req,HttpServletResponse resp) {
-		logger.debug("rtc room 请求 ...");
 		String rid = req.getParameter("rid");
 		String uid = req.getParameter("uid");
 		

@@ -1,13 +1,13 @@
 package com.zain.dto;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.websocket.Session;
 
 public class Client {
 
 	private String id;
-	private List<String> msgs;
+	private ConcurrentLinkedQueue<String> msgs = new ConcurrentLinkedQueue<String>();
 	private long createTime;
 	private Session session;
 
@@ -15,7 +15,7 @@ public class Client {
 		super();
 	}
 
-	public Client(String id, List<String> msgs, long createTime, Session session) {
+	public Client(String id, ConcurrentLinkedQueue<String> msgs, long createTime, Session session) {
 		super();
 		this.id = id;
 		this.msgs = msgs;
@@ -31,11 +31,11 @@ public class Client {
 		this.id = id;
 	}
 
-	public List<String> getMsgs() {
+	public ConcurrentLinkedQueue<String> getMsgs() {
 		return msgs;
 	}
 
-	public void setMsgs(List<String> msgs) {
+	public void setMsgs(ConcurrentLinkedQueue<String> msgs) {
 		this.msgs = msgs;
 	}
 

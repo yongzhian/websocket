@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RoomTable {
 	// 最大通话数量
 	public static final int MAX_COUNT = 20;
-	public static final long MAX_TIME_OUT = 1 * 10 * 1000; //超时时间2分钟
+	public static final long MAX_TIME_OUT = 3 * 10 * 1000; //超时时间2分钟
 	
 	public static Map<String,Room> roomMap=new ConcurrentHashMap<String,Room>();
 	

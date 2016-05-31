@@ -68,7 +68,7 @@ public class Room {
 							}
 							this.cancel(); // 执行一次后销毁
 						}
-					}, RoomTable.MAX_TIME_OUT);// 设定指定的时间time,此处为2000毫秒
+					}, RoomTable.MAX_TIME_OUT);// 设定指定的时间time,此处为30000毫秒
 				}
 			} else { // 多人房间可任意进入
 				this.clientsMap.put(client.getId(), client);

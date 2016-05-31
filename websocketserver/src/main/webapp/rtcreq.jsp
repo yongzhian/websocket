@@ -148,18 +148,26 @@ body {
 			remoteVideo = document.getElementById("remoteVideo");
 
 			noticeMsg();
+			
+			var server = {
+					"iceServers" : [ {
+						"url" : "stun:rtcdev.flwrobot.com:3478"
+					} ]
+				};
+
+			pc = new PeerConnection(server);
+			
 			openChannel();
 			getUserMedia();
 		}
 		
 		// 设置状态
 		function noticeMsg() {
-			if (!initiator) {
-				setNotice("让别人加入（注意事项查看源码）: http://yongzhian.cn:8080/websocketserver/rtc/req.do?rid=${requestScope.rid }");
+			if (!initiator) {//第一个提示其他人加入地址
+				setNotice("不是第一个 让别人加入（注意事项查看源码）: http://yongzhian.cn:8080/websocketserver/rtc/req.do?rid=${requestScope.rid }");
 			} else {
-				setNotice("初始化...");
-				console.log("当前用户信息 : rid=${requestScope.rid }&uid=${requestScope.uid }");
-				console.log("让别人加入（注意事项查看源码）: http://yongzhian.cn:8080/websocketserver/rtc/req.do?rid=${requestScope.rid }");
+				console.log("第一个用户 当前用户信息 : rid=${requestScope.rid }&uid=${requestScope.uid }");
+				console.log("让别人加入（注意事项查看源码）: http://localhost:8080/websocketserver/rtc/req.do?rid=${requestScope.rid }");
 			}
 		}
 
@@ -168,7 +176,7 @@ body {
 			console.log("打开websocket");
 
 			socket = new WebSocket(
-					"ws://yongzhian.cn:8080/websocketserver/rtc/${requestScope.rid}/${requestScope.uid}");
+					"ws://localhost:8080/websocketserver/rtc/${requestScope.rid}/${requestScope.uid}");
 
 			socket.onopen = onChannelOpened;
 			socket.onmessage = onChannelMessage;
@@ -188,7 +196,7 @@ body {
 
 		// 获取用户媒体失败
 		function onUserMediaSuccess(stream) {
-			var url = webkitURL.createObjectURL(stream);
+			var url = URL.createObjectURL(stream);
 			localVideo.style.display = "inline-block";
 			remoteVideo.style.display = "none";
 
@@ -196,7 +204,7 @@ body {
 			localVideoUrl = url;
 			localStream = stream;
 
-			if (initiator)
+			if (initiator) //如果是第一个则可以开始初始化
 				maybeStart();
 		}
 
@@ -220,6 +228,7 @@ body {
 		}
 
 		function setLocalAndSendMessage(sessionDescription) {
+			console.log("sessionDescription : " + sessionDescription);
 			pc.setLocalDescription(sessionDescription);
 			sendMessage(sessionDescription);
 		}
@@ -236,14 +245,6 @@ body {
 
 		// 打开连接
 		function createPeerConnection() {
-			var server = {
-				"iceServers" : [ {
-					"url" : "stun:rtcdev.flwrobot.com:3478"
-				} ]
-			};
-
-			pc = new PeerConnection(server);
-
 			pc.onicecandidate = onIceCandidate;
 			pc.onconnecting = onSessionConnecting;
 			pc.onopen = onSessionOpened;
@@ -282,14 +283,13 @@ body {
 		function processSignalingMessage(message) {
 			var msg = JSON.parse(message);
 
-			if (msg.type === "offer") {
-				if (!initiator && !started)
-					maybeStart();
+			if (msg.type === "offer") { //其他人收到offer则回复
+				if (!initiator && !started) maybeStart();
 				pc.setRemoteDescription(new RTCSessionDescription(msg));
 				doAnswer();
-			} else if (msg.type === "answer" && started) {
+			} else if (msg.type === "answer" && started) { // 第一个收到响应
 				pc.setRemoteDescription(new RTCSessionDescription(msg));
-			} else if (msg.type === "candidate" && started) {
+			} else if (msg.type === "candidate" && pc) {
 				var candidate = new RTCIceCandidate({
 					sdpMLineIndex : msg.label,
 					candidate : msg.candidate
@@ -300,6 +300,8 @@ body {
 			} else if (msg.type === "nowaiting") {
 				onRemoteClose();
 				setNotice("对方已离开！");
+			}else{
+				console.log("收到消息无法识别 : " + msg.type);
 			}
 		}
 
@@ -318,7 +320,8 @@ body {
 				channelOpenTime = new Date();
 			}
 			channelCloseTime = new Date();
-			openChannel();
+			setNotice("websocket关闭");
+			// openChannel(); 关闭时不再打开
 		}
 
 		// 获取用户流失败
@@ -356,7 +359,7 @@ body {
 		function onRemoteStreamAdded(event) {
 			console.log("远程视频添加");
 
-			var url = webkitURL.createObjectURL(event.stream);
+			var url = URL.createObjectURL(event.stream);
 
 			miniVideo.src = localVideo.src;
 			remoteVideo.src = url;

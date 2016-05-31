@@ -2,6 +2,7 @@ package com.zain.websocket;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.websocket.CloseReason;
@@ -28,22 +29,22 @@ public class WebSocket {
 
 	@OnMessage
 	public void onMessage(String message, Session session,@PathParam("rid") String rid, @PathParam("uid") String uid) {
-		logger.info("received message : " + message);
-		logger.info("current sessionid : " + session.getId());
-		logger.info("current room : " + RoomTable.roomMap.get(rid));
-		
-		logger.info("current stored client : " + RoomTable.roomMap.get(rid).getCurrClient(uid));
-		logger.info("current stored client session id : " + RoomTable.roomMap.get(rid).getCurrClient(uid).getSession().getId());
 		List<Client> clientList = RoomTable.roomMap.get(rid).getOtherClient(uid);
+		
+		//即时消息转发
 		if(null != clientList && clientList.size() > 0){
 			for(Client client:clientList){
 				logger.info("current stored other client : " + RoomTable.roomMap.get(rid).getOtherClient(uid));
 				try {
-					client.getSession().getBasicRemote().sendText(uid + " : " + message);
+					client.getSession().getBasicRemote().sendText(message);
+					logger.info("即时发送msg给房间的已有用户,uid" + uid +" :"+ message);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
+		}else{
+			Client currClient = RoomTable.roomMap.get(rid).getCurrClient(uid);
+			currClient.getMsgs().offer(message);// 其实add和offer一样
 		}
 		
 	}
@@ -62,15 +63,24 @@ public class WebSocket {
 		logger.info("客户端连接建立 ,rid : " + rid + "  uid:"+ uid);
 		if (RoomTable.roomMap.containsKey(rid)) { // 当前房间已经存在
 			room = RoomTable.roomMap.get(rid);
-			if (room.addClient(new Client(uid, new CopyOnWriteArrayList<String>(), createTime, session))) {
+			if (room.addClient(new Client(uid, new ConcurrentLinkedQueue<String>(), createTime, session))) {
 				logger.info("Other client join room successed ,rid : " + rid + "  uid:"+ uid);
+				//将之前client的信息发送给该client,双人可以直接poll
+				for(String msg:room.getOtherClient(uid).get(0).getMsgs()){
+					try {
+						logger.info("发送房间中用户的sdp给当前连接的用户:" + msg);
+						session.getBasicRemote().sendText(msg);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 				return;
 			}else{
 				logger.info("Other client join room failed ,rid : " + rid + "  uid:"+ uid);
 			}
 		} else {
 			room = new Room(Room.Type.P2P, rid, createTime); //默认创建p2p房间
-			if (room.addClient(new Client(uid, new CopyOnWriteArrayList<String>(), createTime, session))) {
+			if (room.addClient(new Client(uid, new ConcurrentLinkedQueue<String>(), createTime, session))) {
 				logger.info("The first client join room successed ,rid : " + rid + "  uid:"+ uid);
 				RoomTable.roomMap.put(rid, room); //第一次需要注册房间到RoomTable
 				return;

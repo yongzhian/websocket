@@ -27,7 +27,7 @@
 		 -->
 
 <!-- <script src="https://talkgadget.google.com/talkgadget/channel.js"></script> -->
-<script src="js/channel.js"></script> 
+<script src="/js/channel.js"></script> 
 <style type="text/css">
 * {
 	margin: 0;

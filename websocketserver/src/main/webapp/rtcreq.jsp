@@ -27,7 +27,7 @@
 		 -->
 
 <!-- <script src="https://talkgadget.google.com/talkgadget/channel.js"></script> -->
-<script src="/js/channel.js"></script> 
+<script src="/webrtc/js/channel.js"></script> 
 <style type="text/css">
 * {
 	margin: 0;
@@ -164,10 +164,10 @@ body {
 		// 设置状态
 		function noticeMsg() {
 			if (!initiator) {//第一个提示其他人加入地址
-				setNotice("不是第一个 让别人加入（注意事项查看源码）: http://yongzhian.cn:8080/websocketserver/rtc/req.do?rid=${requestScope.rid }");
 			} else {
+				setNotice("让别人加入地址:https://www.yongzhian.cn/webrtc/rtc/req.do?rid=${requestScope.rid }");
 				console.log("第一个用户 当前用户信息 : rid=${requestScope.rid }&uid=${requestScope.uid }");
-				console.log("让别人加入（注意事项查看源码）: http://localhost:8080/websocketserver/rtc/req.do?rid=${requestScope.rid }");
+				console.log("让别人加入 : https://www.yongzhian.cn/webrtc/rtc/req.do?rid=${requestScope.rid }");
 			}
 		}
 
@@ -176,7 +176,7 @@ body {
 			console.log("打开websocket");
 
 			socket = new WebSocket(
-					"ws://localhost:8080/websocketserver/rtc/${requestScope.rid}/${requestScope.uid}");
+					"wss://www.yongzhian.cn/webrtc/rtc/${requestScope.rid}/${requestScope.uid}");
 
 			socket.onopen = onChannelOpened;
 			socket.onmessage = onChannelMessage;

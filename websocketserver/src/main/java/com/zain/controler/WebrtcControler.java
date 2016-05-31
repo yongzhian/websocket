@@ -34,7 +34,7 @@ public class WebrtcControler {
 		if(StringUtils.isNotBlank(rid)){ //第一个加入
 			req.setAttribute("initiator", "false");
 			req.setAttribute("rid", rid);
-			req.setAttribute("uid", StringTools.genRandomStr(5));
+			req.setAttribute("uid", StringTools.genRandomNum(3));
 		}else{
 			if(RoomTable.roomMap.size() >= RoomTable.MAX_COUNT){
 				try {

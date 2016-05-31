@@ -46,8 +46,8 @@ public class WebrtcControler {
 			}
 			
 			req.setAttribute("initiator", "true");
-			req.setAttribute("rid", StringTools.genRandomStr(5));
-			req.setAttribute("uid", StringTools.genRandomStr(5));
+			req.setAttribute("rid", StringTools.genRandomNum(3));
+			req.setAttribute("uid", StringTools.genRandomNum(3));
 		}
 		
 		return "rtcreq";

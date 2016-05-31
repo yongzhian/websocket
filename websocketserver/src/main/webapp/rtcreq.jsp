@@ -151,7 +151,31 @@ body {
 			openChannel();
 			getUserMedia();
 		}
+		
+		// 设置状态
+		function noticeMsg() {
+			if (!initiator) {
+				setNotice("让别人加入（注意事项查看源码）: http://yongzhian.cn:8080/websocketserver/rtc/req.do?rid=${requestScope.rid }");
+			} else {
+				setNotice("初始化...");
+				console.log("当前用户信息 : rid=${requestScope.rid }&uid=${requestScope.uid }");
+				console.log("让别人加入（注意事项查看源码）: http://yongzhian.cn:8080/websocketserver/rtc/req.do?rid=${requestScope.rid }");
+			}
+		}
 
+		// 打开websocket
+		function openChannel() {
+			console.log("打开websocket");
+
+			socket = new WebSocket(
+					"ws://yongzhian.cn:8080/websocketserver/rtc/${requestScope.rid}/${requestScope.uid}");
+
+			socket.onopen = onChannelOpened;
+			socket.onmessage = onChannelMessage;
+			socket.onclose = onChannelClosed;
+			socket.onerror = onChannelError();
+		}
+		
 		// 获取用户的媒体
 		function getUserMedia() {
 			console.log("获取用户媒体");
@@ -209,35 +233,12 @@ body {
 			console.log("发送信息 : " + msgJson);
 		}
 
-		// 打开websocket
-		function openChannel() {
-			console.log("打开websocket");
-
-			socket = new WebSocket(
-					"ws://yongzhian.cn:8080/websocketserver/rtc/${requestScope.rid}/${requestScope.uid}");
-
-			socket.onopen = onChannelOpened;
-			socket.onmessage = onChannelMessage;
-			socket.onclose = onChannelClosed;
-			socket.onerror = onChannelError();
-		}
-
-		// 设置状态
-		function noticeMsg() {
-			if (!initiator) {
-				setNotice("让别人加入（注意事项查看源码）: http://yongzhian.cn:8080/websocketserver/rtc/req.do?rid=${requestScope.rid }");
-			} else {
-				setNotice("初始化...");
-				console.log("当前用户信息 : rid=${requestScope.rid }&uid=${requestScope.uid }");
-				console.log("让别人加入（注意事项查看源码）: http://yongzhian.cn:8080/websocketserver/rtc/req.do?rid=${requestScope.rid }");
-			}
-		}
 
 		// 打开连接
 		function createPeerConnection() {
 			var server = {
 				"iceServers" : [ {
-					"url" : "stun:stun.l.google.com:19302"
+					"url" : "stun:rtcdev.flwrobot.com:3478"
 				} ]
 			};
 

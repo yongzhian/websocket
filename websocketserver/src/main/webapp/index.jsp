@@ -1,7 +1,7 @@
-<%@ page language="java" pageEncoding="UTF-8"%><%@ page
-	isELIgnored="false"%>
+<%@ page language="java" pageEncoding="UTF-8"%>
+<%@ page isELIgnored="false"%>
 <%
-	String path = request.getContextPath();
+	String  path = request.getContextPath();
 	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 			+ path + "/";
 %>
@@ -28,7 +28,7 @@
 
 </head>
 <body  >
-<a href="rtc/req.do">开始进行rtc 通信</a><br>
+<a href="rtc/req.do">开始进行rtc 通信<%=path %>rtc/req.do</a><br>
 <a href="wstest.jsp">rtc 测试页面</a>
 
 </body>
